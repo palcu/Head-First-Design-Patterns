@@ -1,10 +1,13 @@
-public class CurrentConditionDisplay implements DisplayElement, Observer {
-    private float temp, humidity, heatIndex;
-    private Subject weatherData;
+import java.util.Observable;
+import java.util.Observer;
 
-    public CurrentConditionDisplay(Subject weatherData){
+public class CurrentConditionDisplay implements Observer, DisplayElement {
+    private float temp, humidity, heatIndex;
+    private Observable weatherData;
+
+    public CurrentConditionDisplay(Observable weatherData){
         this.weatherData = weatherData;
-        weatherData.registerObserver(this);
+        weatherData.addObserver(this);
     }
 
     public void display(){
@@ -13,11 +16,13 @@ public class CurrentConditionDisplay implements DisplayElement, Observer {
         System.out.println("Heat index: " + heatIndex);
     }
 
-    public void update(float temp, float humidity, float pressure,
-                       float heatIndex){
-        this.temp = temp;
-        this.humidity = humidity;
-        this.heatIndex = heatIndex;
-        display();
+    public void update(Observable obs, Object arg){
+        if (obs instanceof WeatherData){
+            WeatherData weatherData = (WeatherData)obs;
+            this.temp = weatherData.getTemperature();
+            this.humidity = weatherData.getHumidity();
+            this.heatIndex = weatherData.getHeatIndex();
+            display();
+        }
     }
 }
